@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ハルヒ(@harusa____)</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+
+    <div class="main-card-container">
+        
+        <header class="profile">
+            <div class="profile-top">
+                <div class="profile-img-container">
+                    <img class="profile-img" src="https://i.ifh.cc/Gm9MCf.jpg" alt="프로필">
+                </div>
+                <div class="profile-stats">
+                    <div class="stat-item">
+                        <span class="stat-num" id="postCount">21</span>
+                        <span class="stat-label">投稿</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-num">7.5万</span>
+                        <span class="stat-label">フォロワー</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-num">107</span>
+                        <span class="stat-label">フォロー中</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="profile-bio">
+                <h2 class="username">キャンディーショップ</h2>
+                <p class="instagram-id">@heromak__1</p>
+                <p class="bio-text">📩 協賛・広告のお問い合わせharuhimeee@gmail.com</p>
+                <p class="bio-text">YouTubeチャンネルにもたくさん遊びに来てください！</p>
+                <p class="instagram-id">🔗 www.youtube.com/@harusagi_castle</p>
+            </div>
+
+            <div class="followed-by-container">
+                <div class="followed-by-profiles">
+                    <img src="https://i.ifh.cc/2FkCnn.jpg" alt="친구1">
+                    <img src="https://i.ifh.cc/q5Ajhx.jpg" alt="친구2">
+                    <img src="https://i.ifh.cc/3F0jjY.jpg" alt="친구3">
+                </div>
+                <div class="followed-by-text">
+                    <span class="bold">pium_shibuya109</span>、<span class="bold">heromak__1、</span>他<span class="bold">17人</span>がフォローしています
+                </div>
+            </div>
+
+            <div class="profile-actions">
+                <button class="btn btn-following">フォロー中</button>
+                <button class="btn btn-message">メッセージ</button>
+            </div>
+
+            <div class="highlights-container">
+                <div class="highlight-item" id="highlight-1">
+                    <div class="highlight-img-wrapper">
+                        <img src="https://i.ifh.cc/f2naO7.gif" alt="하이라이트 1">
+                    </div>
+                    <span class="highlight-title">🧘‍♀️🗼👡</span>
+                </div>
+                <div class="highlight-item">
+                    <div class="highlight-img-wrapper">
+                        <img src="https://i.ifh.cc/4RRBQK.jpg" alt="하이라이트 2">
+                    </div>
+                    <span class="highlight-title">モデル彼氏♥</span>
+                </div>
+                <div class="highlight-item">
+                    <div class="highlight-img-wrapper">
+                        <img src="https://i.ifh.cc/QB80bM.jpg" alt="하이라이트 3">
+                    </div>
+                    <span class="highlight-title">✈️</span>
+                </div>
+                <div class="highlight-item">
+                    <div class="highlight-img-wrapper">
+                        <img src="https://i.ifh.cc/pZZGvo.jpg" alt="하이라이트 4">
+                    </div>
+                    <span class="highlight-title">397</span>
+                </div>
+            </div>
+        </header>
+
+        <main id="feed"></main>
+
+        <div id="diary" class="diary-container">
+            <div class="diary-header">
+                <h3>メンバーシップ限定の日記</h3>
+                <button id="backToFeedBtn" class="back-btn">フィードに戻る</button>
+            </div>
+            <div class="diary-list" id="diaryList"></div>
+        </div>
+
+    </div> 
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
