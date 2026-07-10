@@ -60,6 +60,10 @@ const diaries = [
     }
 ];
 
+// 💡 내 JSONbin 고유 키값들 직접 연동
+const BIN_ID = '6a4a4b8679fa234c87d997a2';
+const MASTER_KEY = '$2a$10$dOSeYjaKE7HIZ1VjXsDPU.HZn.TuWxJQoqNqcTw9Bs33txl/2izLW';
+
 if (document.getElementById("postCount")) {
     document.getElementById("postCount").textContent = posts.length;
 }
@@ -70,16 +74,16 @@ const diaryList=document.getElementById("diaryList");
 const highlight1 = document.getElementById("highlight-1");
 const backToFeedBtn = document.getElementById("backToFeedBtn");
 
-// 댓글 목록을 화면에 그려주는 함수 (❌ 삭제 버튼 추가 포함)
+// 화면에 댓글과 ❌ 버튼을 그려주는 함수
 function renderComments(postIdx, commentsArray) {
     const commentListDiv = document.getElementById(`comment-list-${postIdx}`);
     if (!commentListDiv) return;
     
-    commentListDiv.innerHTML = ""; // 초기화 후 재생성
+    commentListDiv.innerHTML = ""; 
     
     commentsArray.forEach((c, commentIdx) => {
         commentListDiv.innerHTML += `
-            <div class="comment-item" style="display: flex; justify-content: space-between; align-items: center; line-height: 1.4;">
+            <div class="comment-item" style="display: flex; justify-content: space-between; align-items: center; line-height: 1.4; margin-bottom: 3px;">
                 <div>
                     <span class="comment-id" style="font-weight: bold; margin-right: 6px;">${c.id}</span>
                     <span>${escapeHtml(c.text)}</span>
@@ -193,12 +197,16 @@ window.toggleLike = function(postIdx) {
     likeCount.textContent = post.likes.toLocaleString();
 }
 
-// [클라우드플레어 주소 연동] 데이터베이스에서 전체 댓글 가져와 동기화하기
+// 1. JSONbin에서 댓글 받아오기 (GET)
 async function refreshAllComments() {
     try {
-        const response = await fetch('/comments');
+        const response = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+            method: 'GET',
+            headers: { 'X-Master-Key': MASTER_KEY }
+        });
         if (!response.ok) return;
-        const allComments = await response.json();
+        const resData = await response.json();
+        const allComments = resData.record || {};
         
         posts.forEach((post, postIdx) => {
             const currentComments = allComments[postIdx] || [];
@@ -216,46 +224,65 @@ async function refreshAllComments() {
 
 window.addEventListener('load', refreshAllComments);
 
-// 댓글 추가 기능
+// 2. JSONbin에 댓글 저장하기 (POST 역할)
 window.addComment = async function(postIdx) {
     const newComment = prompt("코멘트를 입력해주세요:");
     if (!newComment || newComment.trim() === "") return;
 
     try {
-        const response = await fetch('/comments', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ postIdx, text: newComment })
+        const getRes = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+            headers: { 'X-Master-Key': MASTER_KEY }
+        });
+        const resData = await getRes.json();
+        let comments = resData.record || {};
+
+        if (!comments[postIdx]) comments[postIdx] = [];
+        comments[postIdx].push({ id: 'visitor', text: newComment });
+
+        const putRes = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', 'X-Master-Key': MASTER_KEY },
+            body: JSON.stringify(comments)
         });
         
-        if (response.ok) {
+        if (putRes.ok) {
             await refreshAllComments();
         } else {
-            alert("⚠️コメントの投稿に失敗しました");
+            alert("⚠️ 댓글 저장에 실패했습니다.");
         }
     } catch (e) {
-        alert("⚠️サーバーへの接続に失敗しました");
+        alert("⚠️ 데이터베이스 연결 실패");
     }
 }
 
-// 댓글 삭제 기능
+// 3. JSONbin에서 댓글 지우기 (DELETE 역할)
 window.deleteComment = async function(postIdx, commentIdx) {
-    if (!confirm("このコメントを削除してもよろしいですか？")) return;
+    if (!confirm("이 댓글을 정말 삭제하시겠습니까?")) return;
 
     try {
-        const response = await fetch('/comments', {
-            method: 'DELETE',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ postIdx, commentIdx })
+        const getRes = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+            headers: { 'X-Master-Key': MASTER_KEY }
         });
-        
-        if (response.ok) {
-            await refreshAllComments();
-        } else {
-            alert("⚠️コメントの削除に失敗しました");
+        const resData = await getRes.json();
+        let comments = resData.record || {};
+
+        if (comments[postIdx] && comments[postIdx][commentIdx]) {
+            comments[postIdx].splice(commentIdx, 1); // 배열에서 선택한 댓글 삭제
+
+            const putRes = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', 'X-Master-Key': MASTER_KEY },
+                body: JSON.stringify(comments)
+            });
+
+            if (putRes.ok) {
+                await refreshAllComments();
+            } else {
+                alert("⚠️ 댓글 삭제에 실패했습니다.");
+            }
         }
     } catch (e) {
-        alert("⚠️通信中にエラーが発生しました");
+        alert("⚠️ 통신 에러 발생");
     }
 }
 
